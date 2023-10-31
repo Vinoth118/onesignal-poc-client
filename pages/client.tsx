@@ -73,16 +73,24 @@ const Client: NextPage = () => {
 
     const onLoginSuccess = async (resData: { user: User, oneSignalAppId: string }) => {
         setLoggedInUser(resData);
-        const onesignalLoaded = await OneSignal.init({ appId: resData.oneSignalAppId });
-        console.log('loaded', onesignalLoaded);
+        try {
+            const onesignalLoaded = await OneSignal.init({ appId: resData.oneSignalAppId });
+            console.log('loaded', onesignalLoaded);
+        } catch(e) {
+            console.log('error while loading onesignal on login', e)
+        }
         OneSignal.Slidedown.promptPush();
         OneSignal.login(resData.user.id);
     }
 
     const onLogout = async () => {
-        const onesignalLoaded = await OneSignal.init({ appId: loggedInUser!.oneSignalAppId });
-        console.log('loaded', onesignalLoaded);
-        OneSignal.logout();
+        try{
+            const onesignalLoaded = await OneSignal.init({ appId: loggedInUser!.oneSignalAppId });
+            console.log('loaded', onesignalLoaded);
+            OneSignal.logout();
+        } catch(e) {
+            console.log('error while loading onesignal on logout', e)
+        }
         setLoggedInUser(null);
     }
     
