@@ -2,13 +2,22 @@ import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input,
 import { ChangeEvent, useState } from 'react';
 
 export interface User {
+    id: string,
     name: string,
     email: string,
-    org: 'vinoth' | 'vijay' | 'johny'
+    org: 'vinoth' | 'vijay' | 'johny',
+    osId?: string,
+    subscriptions?: { id: string, token: string, type: string }[]
+}
+
+export interface NewUser extends Omit<User, 'id'> {
+    name: string,
+    email: string,
+    org: 'vinoth' | 'vijay' | 'johny',
 }
 
 interface UserFormProps {
-    onSubmit: (data: User) => Promise<boolean> | Promise<void> | void,
+    onSubmit: (data: NewUser) => Promise<boolean> | Promise<void> | void,
     formFor: 'LOGIN' | 'REGISTER',
     formFrom?: 'CLIENT' | 'ADMIN',
 }

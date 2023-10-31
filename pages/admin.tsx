@@ -11,7 +11,7 @@ import {
     useDisclosure,
     Spinner
 } from '@chakra-ui/react'
-import UserForm, { User } from '../components/admin/register_user';
+import UserForm, { NewUser, User } from '../components/admin/register_user';
 import PushNotification from '../components/admin/push_notification';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -29,7 +29,7 @@ const Admin: NextPage = () => {
     const getUsers = async () => {
         setGetUsersLoading(true);
         try {
-            const res = await axios.get('http://localhost:3000/users');
+            const res = await axios.get('/users');
             if(res.data && res.data.success) {
                 setUsers(res.data.data);
             }
@@ -37,12 +37,12 @@ const Admin: NextPage = () => {
         setGetUsersLoading(false);
     }
 
-    const onRegister = async (data: User) => {
+    const onRegister = async (data: NewUser) => {
         console.log(data);
         try {
-            const res = await axios.post('http://localhost:3000/register', { ...data, registerFrom: 'ADMIN' });
+            const res = await axios.post('/register', { ...data, registerFrom: 'ADMIN' });
             if(res.data && res.data.success) {
-                setUsers(prev => [...prev, res.data.data]);
+                setUsers(prev => [...prev, res.data.data.user]);
                 toast({
                     title: 'User added successfully!',
                     position: 'top-right',
@@ -71,7 +71,7 @@ const Admin: NextPage = () => {
     }
 
     return (
-        <Flex w = '100%' h = '100vh' direction={['column', 'column', 'row', 'row', 'row']} gap = '20px'>
+        <Flex w = '100%' minH = '100vh' direction={['column', 'column', 'row', 'row', 'row']} gap = '20px'>
             <AlertDialog isOpen = {isOpen} leastDestructiveRef = {null as any} onClose = {onClose}>
                 <AlertDialogOverlay>
                     <AlertDialogContent>
@@ -109,7 +109,7 @@ const Admin: NextPage = () => {
                 </Flex>
                 <Button onClick={onOpen} flexShrink = {0} w = '100%' bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>Show Users</Button>
             </Flex>
-            <Flex flexShrink={0} w = {['100%', '100%', '4px', '4px', '4px']} h = {['4px', '4px', '100%', '100%', '100%']} bg = 'black' />
+            <Flex flexShrink={0} w = {['100%', '100%', '4px', '4px', '4px']} h = {['4px', '4px', 'inherit', 'inherit', 'inherit']} bg = 'black' />
             <Flex w = '100%' h = '100%' p = '15px'>
                 <PushNotification userList = {users} />
             </Flex>

@@ -1,9 +1,14 @@
 import { useState, useEffect, useRef, SetStateAction, Dispatch } from 'react';
 import { User } from '../admin/register_user';
 
-const useLocalStorage = (key: string): [null | User, Dispatch<SetStateAction<User | null>>] => {
+interface LoggedInUserDetails {
+  user: User,
+  oneSignalAppId: string
+}
+
+const useLocalStorage = (key: string): [null | LoggedInUserDetails, Dispatch<SetStateAction<LoggedInUserDetails | null>>] => {
     const isMounted = useRef(false)
-    const [value, setValue] = useState<null | User>(null)
+    const [value, setValue] = useState<null | LoggedInUserDetails>(null)
   
     useEffect(() => {
       try {

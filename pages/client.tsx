@@ -1,16 +1,17 @@
 import type { NextPage } from 'next';
 import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input, Text, Textarea, useToast } from '@chakra-ui/react'
 import { ChangeEvent, useState } from 'react';
-import UserForm, { User } from '../components/admin/register_user';
+import UserForm, { NewUser, User } from '../components/admin/register_user';
 import useLocalStorage from '../components/hooks/use_localstorage';
 import axios from 'axios';
+import OneSignal from 'react-onesignal';
 
 const Client: NextPage = () => {
     const [loggedInUser, setLoggedInUser] = useLocalStorage('loggedInUser');
     const [formType, setFormType] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
     const toast = useToast();
 
-    const onLoginOrRegister = (data: User) => {
+    const onLoginOrRegister = (data: NewUser) => {
         if(formType == 'LOGIN') {
             onLogin(data);
         } else {
@@ -18,11 +19,11 @@ const Client: NextPage = () => {
         }
     }
 
-    const onLogin = async (data: User) => {
+    const onLogin = async (data: NewUser) => {
         try {
-            const res = await axios.post('http://localhost:3000/login', { email: data.email });
+            const res = await axios.post('/login', { email: data.email });
             if(res.data && res.data.success) {
-                setLoggedInUser(res.data.data);
+                onLoginSuccess(res.data.data);
                 return true;
             } else {
                 toast({
@@ -44,11 +45,11 @@ const Client: NextPage = () => {
         } 
     }
 
-    const onRegister = async (data: User) => {
+    const onRegister = async (data: NewUser) => {
         try {
-            const res = await axios.post('http://localhost:3000/register', { email: data.email, name: data.name });
+            const res = await axios.post('/register', { email: data.email, name: data.name });
             if(res.data && res.data.success) {
-                setLoggedInUser(res.data.data);
+                onLoginSuccess(res.data.data);
                 return true;
             } else {
                 toast({
@@ -70,7 +71,18 @@ const Client: NextPage = () => {
         } 
     }
 
-    const onLogout = () => {
+    const onLoginSuccess = async (resData: { user: User, oneSignalAppId: string }) => {
+        setLoggedInUser(resData);
+        const onesignalLoaded = await OneSignal.init({ appId: resData.oneSignalAppId });
+        console.log('loaded', onesignalLoaded);
+        OneSignal.Slidedown.promptPush();
+        OneSignal.login(resData.user.id);
+    }
+
+    const onLogout = async () => {
+        const onesignalLoaded = await OneSignal.init({ appId: loggedInUser!.oneSignalAppId });
+        console.log('loaded', onesignalLoaded);
+        OneSignal.logout();
         setLoggedInUser(null);
     }
     
@@ -84,10 +96,10 @@ const Client: NextPage = () => {
                         <Flex top = {'50%'} left = {'50%'} transform = 'translate(-50%, -50%)' position={'absolute'} w = '150px' h = '2px' bg = 'black' />
                         <Flex top = {'50%'} left = {'50%'} transform = 'translate(-50%, -50%)' w = 'fit-content' h = 'fit-content' position={'absolute'} p = '5px' borderRadius={'40%'} bg = 'white'>Or</Flex>
                     </Flex>
-                    <Button onClick={() => setFormType(prev => prev == 'REGISTER' ? 'LOGIN' : 'REGISTER')} flexShrink = {0} w = '100%' bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>{formType == 'REGISTER' ? 'Login' : 'Sign Up'}</Button>
+                    <Button onClick={() => setFormType(prev => prev == 'REGISTER' ? 'LOGIN' : 'REGISTER')} flexShrink = {0} w = '100%' bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>{formType == 'REGISTER' ? 'Have account? Login' : "Doesn't have account? Sign Up"}</Button>
                 </Flex> :
                 <Flex direction={'column'} minW = {['350px', '400px', '400px', '400px', '400px']} m = 'auto' gap = '20px' alignItems={'center'}>
-                    <Heading w = 'fit-content'>Hi, {loggedInUser.name}</Heading>
+                    <Heading w = 'fit-content'>Hi, {loggedInUser.user.name}</Heading>
                     <Button onClick={onLogout} w = '100%' bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>Logout</Button>
                 </Flex>
             }

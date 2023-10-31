@@ -1,7 +1,11 @@
 import { Button, Flex, Text } from '@chakra-ui/react'
-import type { NextPage } from 'next'
+import type { GetServerSideProps, NextPage } from 'next'
 import NextLink from 'next/link'
 import { Link } from '@chakra-ui/react'
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return { redirect: { permanent: true, destination: '/client' } }
+}
 
 const Home: NextPage = () => {
   return (
