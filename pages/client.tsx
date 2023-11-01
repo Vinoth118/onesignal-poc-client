@@ -27,7 +27,7 @@ const Client: NextPage = () => {
                 return true;
             } else {
                 toast({
-                    title: 'Email registered yet!',
+                    title: 'Email not registered yet!',
                     position: 'top-right',
                     isClosable: true,
                     status: 'error'
@@ -75,11 +75,11 @@ const Client: NextPage = () => {
         setLoggedInUser(resData);
         OneSignal.init({ appId: resData.oneSignalAppId }).then(e => {
             console.log('loaded', e);
+            OneSignal.Slidedown.promptPush();
+            OneSignal.login(resData.user.id);
         }).catch(e => {
             console.log('error while loading onesignal on login', e)
-        });
-        OneSignal.Slidedown.promptPush();
-        OneSignal.login(resData.user.id);
+        });   
     }
 
     const onLogout = async () => {
