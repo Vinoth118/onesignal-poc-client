@@ -2,13 +2,22 @@ import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input,
 import React, { ChangeEvent, useState, PropsWithChildren, ReactNode } from 'react';
 import { User } from './register_user';
 
-interface PushNotificationProps {
-    userList?: User[]
+export interface NotificationPayload { 
+    msg: string, 
+    to: 'all' | 'org' | 'user', 
+    org: 'vinoth' | 'vijay' | 'johny', 
+    userId: string
 }
 
-const PushNotification = ({ userList }: PushNotificationProps) => {
-    type StateType = { msg: string, to: 'all' | 'org' | 'user', org: 'vinoth' | 'vijay' | 'johny' }
-    const [formData, setFormData] = useState<StateType>({ msg: '', to: 'all', org: 'vinoth' });
+interface PushNotificationProps {
+    userList?: User[],
+    onSubmit: (data: NotificationPayload) => Promise<boolean> | Promise<void> | void,
+    isLoading: boolean
+}
+
+const PushNotification = ({ userList, onSubmit, isLoading }: PushNotificationProps) => {
+    type StateType = { msg: { value: string, error: boolean }, to: 'all' | 'org' | 'user', org: 'vinoth' | 'vijay' | 'johny', userId: { value: string, error: boolean } }
+    const [formData, setFormData] = useState<StateType>({ msg: { value: '', error: false }, to: 'all', org: 'vinoth', userId: { value: '', error: false } });
 
     const { getRootProps, getRadioProps } = useRadioGroup({
         name: 'notify_to',
@@ -36,12 +45,34 @@ const PushNotification = ({ userList }: PushNotificationProps) => {
     });
     const orgRadioGroup = getRootPropsForOrg();
 
+    const onChangeMsg = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        setFormData(prev => ({ ...prev, msg: { value: event.target.value, error: event.target.value == '' } }))
+    }
+
+    const onChangeUser = (event: ChangeEvent<HTMLSelectElement>) => {
+        setFormData(prev => ({ ...prev, userId: { value: event.target.value, error: prev.to == 'user' && event.target.value == '' } }))
+    }
+
+    const validateForm = () => {
+        const temp: StateType = JSON.parse(JSON.stringify(formData));
+        temp.userId.error = temp.to == 'user' && temp.userId.value == '';
+        temp.msg.error = temp.msg.value == '';
+        setFormData(temp);
+        return temp.msg.error == true || temp.userId.error == true;
+    }
+
+    const onClickSubmit = async () => {
+        if(validateForm()) return ;
+        const isSucceeded = await onSubmit({ ...formData, msg: formData.msg.value, userId: formData.userId.value });
+        if(isSucceeded) setFormData({ msg: { value: '', error: false }, to: 'all', org: 'vinoth', userId: { value: '', error: false } })
+    }
+
     return (
         <Flex w = '100%' direction={'column'} alignItems={'center'} gap = '20px'>
             <Heading>Push Notification</Heading>
-            <FormControl>
+            <FormControl isInvalid = {formData.msg.error}>
                 <FormLabel>Message</FormLabel>
-                <Textarea value = {formData.msg} />
+                <Textarea value = {formData.msg.value} onChange = {onChangeMsg} />
                 <FormErrorMessage ml ='10px'>Please type message!</FormErrorMessage>
             </FormControl>
 
@@ -76,25 +107,24 @@ const PushNotification = ({ userList }: PushNotificationProps) => {
                             </RadioCard>
                         </Flex> :
                         <Flex direction = 'column'>
-                            {
-                                userList != null ?
-                                <Select>
+                            <FormControl isInvalid = {formData.userId.error}>
+                                <Select value = {formData.userId.value} onChange = {onChangeUser}>
                                     <option value = ''>Select option</option>
                                     {
-                                        userList.map(user => {
-                                            return <option key = {user.email} value = {user.email}>{user.name}</option>
+                                        userList?.map(user => {
+                                            return <option key = {user.email + user.org} value = {user.id}>{user.name} ( {user.org}.trendytreasures.nl )</option>
                                         })
                                     }
-                                </Select> :
-                                <Input placeholder = 'Enter user email ID' />
-                            }                   
+                                </Select>       
+                                <FormErrorMessage ml = '10px'>User is required to send notification to specific user!</FormErrorMessage>
+                            </FormControl>         
                         </Flex>
                     }
                 </Collapse>
 
             </Flex>
 
-            <Button mt = '20px' w = '100%' flexShrink = {0} bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>Send Notification</Button>
+            <Button onClick={onClickSubmit} isLoading = {isLoading} mt = '20px' w = '100%' flexShrink = {0} bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>Send Notification</Button>
         </Flex>
     );
 }

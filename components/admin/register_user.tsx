@@ -20,9 +20,10 @@ interface UserFormProps {
     onSubmit: (data: NewUser) => Promise<boolean> | Promise<void> | void,
     formFor: 'LOGIN' | 'REGISTER',
     formFrom?: 'CLIENT' | 'ADMIN',
+    isLoading?: boolean
 }
 
-const UserForm = ({ onSubmit, formFor, formFrom = 'ADMIN' }: UserFormProps) => {
+const UserForm = ({ onSubmit, formFor, formFrom = 'ADMIN', isLoading = false }: UserFormProps) => {
     const [formData, setFormData] = useState({ name: { value: '', error: false }, email: { value: '', error: false }, org: { value: 'vinoth' as User['org'], error: false } });
 
     const onChangeFormData = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -76,7 +77,7 @@ const UserForm = ({ onSubmit, formFor, formFrom = 'ADMIN' }: UserFormProps) => {
                     <FormErrorMessage ml ='10px'>Organisation is required!</FormErrorMessage>
                 </FormControl>
             }
-            <Button onClick={onSubmitForm} mt = '20px' w = '100%' bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>{formFor == 'REGISTER' ? 'Register' : 'Login'}</Button>
+            <Button onClick={onSubmitForm} isLoading = {isLoading} mt = '20px' w = '100%' bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>{formFor == 'REGISTER' ? 'Register' : 'Login'}</Button>
         </Flex>
     );
 }

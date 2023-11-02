@@ -12,13 +12,14 @@ import {
     Spinner
 } from '@chakra-ui/react'
 import UserForm, { NewUser, User } from '../components/admin/register_user';
-import PushNotification from '../components/admin/push_notification';
+import PushNotification, { NotificationPayload } from '../components/admin/push_notification';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const Admin: NextPage = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [getUsersLoading, setGetUsersLoading] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
 
@@ -38,6 +39,7 @@ const Admin: NextPage = () => {
     }
 
     const onRegister = async (data: NewUser) => {
+        setSubmitLoading(true);
         console.log(data);
         try {
             const res = await axios.post('/register', { ...data, registerFrom: 'ADMIN' });
@@ -49,6 +51,7 @@ const Admin: NextPage = () => {
                     isClosable: true,
                     status: 'success'
                 })
+                setSubmitLoading(false);
                 return true;
             } else {
                 toast({
@@ -57,6 +60,7 @@ const Admin: NextPage = () => {
                     isClosable: true,
                     status: 'error'
                 })
+                setSubmitLoading(false);
                 return false;
             }
         } catch(e) {
@@ -66,6 +70,42 @@ const Admin: NextPage = () => {
                 isClosable: true,
                 status: 'error'
             })
+            setSubmitLoading(false);
+            return false;
+        }
+    }
+
+    const onPushNotification = async (data: NotificationPayload) => {
+        setSubmitLoading(true);
+        try {
+            const res = await axios.post('/notify', data);
+            if(res.data && res.data.success) {
+                toast({
+                    title: 'Notification pushed successfully!',
+                    position: 'top-right',
+                    isClosable: true,
+                    status: 'success'
+                })
+                setSubmitLoading(false);
+                return true;
+            } else {
+                toast({
+                    title: 'Push Notification failed!',
+                    position: 'top-right',
+                    isClosable: true,
+                    status: 'error'
+                })
+                setSubmitLoading(false);
+                return false;
+            }
+        } catch(e) {
+            toast({
+                title: 'Something went wrong!',
+                position: 'top-right',
+                isClosable: true,
+                status: 'error'
+            })
+            setSubmitLoading(false);
             return false;
         }
     }
@@ -111,7 +151,7 @@ const Admin: NextPage = () => {
             </Flex>
             <Flex flexShrink={0} w = {['100%', '100%', '4px', '4px', '4px']} h = {['4px', '4px', 'inherit', 'inherit', 'inherit']} bg = 'black' />
             <Flex w = '100%' h = '100%' p = '15px'>
-                <PushNotification userList = {users} />
+                <PushNotification isLoading = {submitLoading} onSubmit={onPushNotification} userList = {users} />
             </Flex>
         </Flex>
     )
