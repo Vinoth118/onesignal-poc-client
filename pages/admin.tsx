@@ -20,6 +20,7 @@ const Admin: NextPage = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [getUsersLoading, setGetUsersLoading] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
+    const [registerLoading, setRegisterLoading] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
 
@@ -39,7 +40,7 @@ const Admin: NextPage = () => {
     }
 
     const onRegister = async (data: NewUser) => {
-        setSubmitLoading(true);
+        setRegisterLoading(true);
         console.log(data);
         try {
             const res = await axios.post('/register', { ...data, registerFrom: 'ADMIN' });
@@ -51,7 +52,7 @@ const Admin: NextPage = () => {
                     isClosable: true,
                     status: 'success'
                 })
-                setSubmitLoading(false);
+                setRegisterLoading(false);
                 return true;
             } else {
                 toast({
@@ -60,7 +61,7 @@ const Admin: NextPage = () => {
                     isClosable: true,
                     status: 'error'
                 })
-                setSubmitLoading(false);
+                setRegisterLoading(false);
                 return false;
             }
         } catch(e) {
@@ -70,7 +71,7 @@ const Admin: NextPage = () => {
                 isClosable: true,
                 status: 'error'
             })
-            setSubmitLoading(false);
+            setRegisterLoading(false);
             return false;
         }
     }
@@ -146,7 +147,7 @@ const Admin: NextPage = () => {
                 </AlertDialogOverlay>
             </AlertDialog>
             <Flex w = '100%' h = '100%' p = '15px' direction={'column'} gap = '30px'>
-                <UserForm onSubmit = {onRegister} formFor = 'REGISTER' />
+                <UserForm onSubmit = {onRegister} isLoading = {registerLoading} formFor = 'REGISTER' />
                 <Flex w = '100%' position={'relative'} alignItems = 'center' h = '50px'>
                     <Flex top = {'50%'} left = {'50%'} transform = 'translate(-50%, -50%)' position={'absolute'} w = '150px' h = '2px' bg = 'black' />
                     <Flex top = {'50%'} left = {'50%'} transform = 'translate(-50%, -50%)' w = 'fit-content' h = 'fit-content' position={'absolute'} p = '5px' borderRadius={'40%'} bg = 'white'>Or</Flex>
