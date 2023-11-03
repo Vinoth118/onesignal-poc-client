@@ -1,6 +1,7 @@
-import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input, Text, Textarea, Collapse, useRadio, UseRadioProps, useRadioGroup, Select } from '@chakra-ui/react'
+import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input, Text, Textarea, Collapse, useRadio, UseRadioProps, useRadioGroup, Select, IconButton, Spinner, Icon } from '@chakra-ui/react'
 import React, { ChangeEvent, useState, PropsWithChildren, ReactNode } from 'react';
 import { User } from './register_user';
+import { MdReplay } from 'react-icons/md'
 
 export interface NotificationPayload { 
     msg: string, 
@@ -12,12 +13,14 @@ export interface NotificationPayload {
 interface PushNotificationProps {
     userList?: User[],
     onSubmit: (data: NotificationPayload) => Promise<boolean> | Promise<void> | void,
+    onClickRefreshUsers: () => void,
+    userFetchLoading: boolean,
     isLoading: boolean
 }
 
-const PushNotification = ({ userList, onSubmit, isLoading }: PushNotificationProps) => {
+const PushNotification = ({ userList, onSubmit, onClickRefreshUsers, userFetchLoading, isLoading }: PushNotificationProps) => {
     type StateType = { msg: { value: string, error: boolean }, to: 'all' | 'org' | 'user', org: 'vinoth' | 'vijay' | 'johny', userId: { value: string, error: boolean } }
-    const [formData, setFormData] = useState<StateType>({ msg: { value: '', error: false }, to: 'all', org: 'vinoth', userId: { value: '', error: false } });
+    const [formData, setFormData] = useState<StateType>({ msg: { value: '', error: false }, to: 'org', org: 'vinoth', userId: { value: '', error: false } });
 
     const { getRootProps, getRadioProps } = useRadioGroup({
         name: 'notify_to',
@@ -81,9 +84,9 @@ const PushNotification = ({ userList, onSubmit, isLoading }: PushNotificationPro
             <Flex w = '100%' gap = '20px' direction = {'column'} {...radioGroup} p = '20px' borderRadius = {'10px'} border = '1px'>
 
                 <Flex w = '100%' gap = '10px'>
-                    <RadioCard2 {...getRadioProps({ value: 'all' })} isChecked = {formData.to == 'all'} >
+                    {/* <RadioCard2 {...getRadioProps({ value: 'all' })} isChecked = {formData.to == 'all'} >
                         <Text cursor = 'pointer'>All users</Text>
-                    </RadioCard2>
+                    </RadioCard2> */}
                     <RadioCard2 {...getRadioProps({ value: 'org' })} isChecked = {formData.to == 'org'} >
                         <Text cursor = 'pointer'>Organisation</Text>
                     </RadioCard2>
@@ -108,14 +111,23 @@ const PushNotification = ({ userList, onSubmit, isLoading }: PushNotificationPro
                         </Flex> :
                         <Flex direction = 'column'>
                             <FormControl isInvalid = {formData.userId.error}>
-                                <Select value = {formData.userId.value} onChange = {onChangeUser}>
-                                    <option value = ''>Select option</option>
-                                    {
-                                        userList?.map(user => {
-                                            return <option key = {user.email + user.org} value = {user.id}>{user.name} ( {user.org}.trendytreasures.nl )</option>
-                                        })
-                                    }
-                                </Select>       
+                                <Flex alignItems={'center'} justifyContent = 'space-between'>
+                                    <Select value = {formData.userId.value} onChange = {onChangeUser}>
+                                        <option value = ''>Select option</option>
+                                        {
+                                            userList?.map(user => {
+                                                return <option key = {user.email + user.org} value = {user.id}>{user.name} ( {user.org}.trendytreasures.nl )</option>
+                                            })
+                                        }
+                                    </Select>    
+                                    <Flex w = '50px' justifyContent={'flex-end'}>
+                                        {   
+                                            userFetchLoading == false ?
+                                            <IconButton onClick = {onClickRefreshUsers} aria-label={'refreshIcon'} p = {0} bg = "none" border = "0px" borderRadius = "20px" icon={<Icon w = '20px' h = '20px' color = 'brand.primary' as = {MdReplay} />} /> :
+                                            <Spinner size = {'md'} thickness = '3px' color = 'black' />
+                                        }
+                                    </Flex>
+                                </Flex>   
                                 <FormErrorMessage ml = '10px'>User is required to send notification to specific user!</FormErrorMessage>
                             </FormControl>         
                         </Flex>

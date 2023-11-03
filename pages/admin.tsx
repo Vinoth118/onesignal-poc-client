@@ -124,6 +124,10 @@ const Admin: NextPage = () => {
                                 <Flex w = '100%' py = '50px' justifyContent={'center'}>
                                     <Spinner colorScheme={'blackAlpha'} size = 'xl' thickness='4px' />
                                 </Flex> :
+                                users.length < 1 ? 
+                                <Flex w = '100%' py = '50px' justifyContent={'center'}>
+                                    <Text>No user registered yet!</Text>
+                                </Flex>:
                                 users.map((user, index) => {
                                     return <Flex key = {user.email} w = '100%' direction={'column'} p = '10px' border = '1px' borderRadius={'8px'} mb = '15px'>
                                         <Text fontSize={'lg'}>{user.name}</Text>
@@ -147,11 +151,11 @@ const Admin: NextPage = () => {
                     <Flex top = {'50%'} left = {'50%'} transform = 'translate(-50%, -50%)' position={'absolute'} w = '150px' h = '2px' bg = 'black' />
                     <Flex top = {'50%'} left = {'50%'} transform = 'translate(-50%, -50%)' w = 'fit-content' h = 'fit-content' position={'absolute'} p = '5px' borderRadius={'40%'} bg = 'white'>Or</Flex>
                 </Flex>
-                <Button onClick={onOpen} flexShrink = {0} w = '100%' bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>Show Users</Button>
+                <Button onClick={() => {getUsers(); onOpen();}} flexShrink = {0} w = '100%' bg = 'black' color = 'white' _hover={{ bg: 'blackAlpha.700' }}>Show Users</Button>
             </Flex>
             <Flex flexShrink={0} w = {['100%', '100%', '4px', '4px', '4px']} h = {['4px', '4px', 'inherit', 'inherit', 'inherit']} bg = 'black' />
             <Flex w = '100%' h = '100%' p = '15px'>
-                <PushNotification isLoading = {submitLoading} onSubmit={onPushNotification} userList = {users} />
+                <PushNotification onClickRefreshUsers={() => getUsers()} userFetchLoading = {getUsersLoading} isLoading = {submitLoading} onSubmit={onPushNotification} userList = {users} />
             </Flex>
         </Flex>
     )

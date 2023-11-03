@@ -85,9 +85,9 @@ const Client: NextPage = () => {
                     isClosable: true,
                     status: 'error'
                 })
+                setSubmitLoading(false);
                 return false;
             }
-            setSubmitLoading(false);
         } catch(e) {
             toast({
                 title: 'Something went wrong!',
