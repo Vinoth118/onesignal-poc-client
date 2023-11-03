@@ -84,9 +84,9 @@ const PushNotification = ({ userList, onSubmit, onClickRefreshUsers, userFetchLo
             <Flex w = '100%' gap = '20px' direction = {'column'} {...radioGroup} p = '20px' borderRadius = {'10px'} border = '1px'>
 
                 <Flex w = '100%' gap = '10px'>
-                    {/* <RadioCard2 {...getRadioProps({ value: 'all' })} isChecked = {formData.to == 'all'} >
+                    <RadioCard2 {...getRadioProps({ value: 'all' })} isChecked = {formData.to == 'all'} >
                         <Text cursor = 'pointer'>All users</Text>
-                    </RadioCard2> */}
+                    </RadioCard2>
                     <RadioCard2 {...getRadioProps({ value: 'org' })} isChecked = {formData.to == 'org'} >
                         <Text cursor = 'pointer'>Organisation</Text>
                     </RadioCard2>
