@@ -2,7 +2,7 @@ import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input,
 import { ChangeEvent, useState } from 'react';
 
 export interface User {
-    id: string,
+    _id: string,
     name: string,
     email: string,
     org: 'vinoth' | 'vijay' | 'johny',
@@ -10,7 +10,7 @@ export interface User {
     subscriptions?: { id: string, token: string, type: string }[]
 }
 
-export interface NewUser extends Omit<User, 'id'> {
+export interface NewUser extends Omit<User, '_id'> {
     name: string,
     email: string,
     org: 'vinoth' | 'vijay' | 'johny',

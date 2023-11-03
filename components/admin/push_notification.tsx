@@ -116,7 +116,7 @@ const PushNotification = ({ userList, onSubmit, onClickRefreshUsers, userFetchLo
                                         <option value = ''>Select option</option>
                                         {
                                             userList?.map(user => {
-                                                return <option key = {user.email + user.org} value = {user.id}>{user.name} ( {user.org}.trendytreasures.nl )</option>
+                                                return <option key = {user.email + user.org} value = {user._id}>{user.name} ( {user.org}.trendytreasures.nl )</option>
                                             })
                                         }
                                     </Select>    

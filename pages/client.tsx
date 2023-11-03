@@ -108,11 +108,11 @@ const Client: NextPage = () => {
         // OneSignalDeferred.push(async function(OneSignal: IOneSignalOneSignal) {
         //     await OneSignal.init({ appId: resData.oneSignalAppId, allowLocalhostAsSecureOrigin: true });
         //     OneSignal.Slidedown.promptPush();
-        //     OneSignal.login(resData.user.id);
+        //     OneSignal.login(resData.user._id);
         // });
         await initializeOneSignal(resData.oneSignalAppId);
         OneSignal.Slidedown.promptPush();
-        OneSignal.login(resData.user.id);   
+        OneSignal.login(resData.user._id);   
     }
 
     const onLogout = async () => {
